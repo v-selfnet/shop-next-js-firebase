@@ -1,9 +1,10 @@
+import HeroSwiper from "./HeroSwiper";
 
 
 const HomePage = () => {
   return (
     <main>
-      Home Page
+     <HeroSwiper></HeroSwiper>
      
     </main>
   )
