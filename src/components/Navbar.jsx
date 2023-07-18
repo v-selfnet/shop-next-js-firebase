@@ -1,16 +1,25 @@
 'use client';
 
 import { afterLoginNavData, beforeLoginNavData } from "@/data/navData";
+import useAuth from "@/hooks/useAuth";
 import useTheme from "@/hooks/useTheme";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-
+import { toast } from "react-hot-toast";
 
 const Navbar = () => {
     const { theme, toggleTheme } = useTheme()
-    const uid = false;
+    const { user, logOut } = useAuth();
+    const { uid, displayName, email, password, photoURL } = user || {};
+
     const navData = uid ? afterLoginNavData : beforeLoginNavData;
     const [toggleMenu, setToggleMenu] = useState(false)
+
+    const handleLogout = async () => {
+        await logOut();
+        toast.success('Successfully Logout!')
+    }
     const navItems = <>
         {
             navData.map(({ path, title }) =>
@@ -26,7 +35,7 @@ const Navbar = () => {
                 {/* <div className={`dropdown ${toggleMenu ? 'hidden': 'bg-green-300'}`}> */}
                 <div className="dropdown">
                     <label tabIndex={0} className="btn btn-ghost lg:hidden">
-                        <input onChange={() => setToggleMenu(pre => !pre)} hidden type="checkbox"/>
+                        <input onChange={() => setToggleMenu(pre => !pre)} hidden type="checkbox" />
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
                     </label>
                     <ul tabIndex={0} className={`menu menu-sm dropdown-content ${toggleMenu ? '' : 'hidden'} mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52`}>
@@ -41,6 +50,8 @@ const Navbar = () => {
                 </ul>
             </div>
             <div className="navbar-end flex gap-6">
+                {/* logout button */}
+                <button onClick={handleLogout} className="btn btn-primary btn-xs">Logout</button>
                 {/* shop cart */}
                 <label tabIndex={0} className="btn btn-ghost btn-circle">
                     <div className="indicator">
@@ -49,11 +60,20 @@ const Navbar = () => {
                     </div>
                 </label>
                 {/* profile image */}
-                <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-                    <div className="w-10 rounded-full">
-                        <img src="/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-                    </div>
-                </label>
+                {
+                    uid &&
+                    <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+                        <div className="w-10 rounded-full">
+                            <Image
+                                alt='Loading...'
+                                title={displayName}
+                                src={photoURL}
+                                width={40}
+                                hight={40}
+                            />
+                        </div>
+                    </label>
+                }
                 {/* dark/light toggle */}
                 <label className="swap swap-rotate">
                     <input onChange={toggleTheme} type="checkbox" checked={theme === 'dark'} />

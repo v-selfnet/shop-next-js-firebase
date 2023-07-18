@@ -3,6 +3,8 @@ import { Roboto } from 'next/font/google'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import Providers from '@/providers'
+import Toaster from '@/components/Toaster'
+
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],
@@ -23,6 +25,7 @@ const RootLayout = ({ children }) => {
           <main className='p-10'>{children}</main>
           <Footer></Footer>
         </Providers>
+        <Toaster></Toaster>
 
       </body>
     </html>
