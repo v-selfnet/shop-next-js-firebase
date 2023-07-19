@@ -1,7 +1,7 @@
 
 import { initializeApp } from "firebase/app";
 
-console.log(process.env.NEXT_PUBLIC_APIKEY)
+// console.log("Firebase: ", process.env.NEXT_PUBLIC_APIKEY)
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_APIKEY,

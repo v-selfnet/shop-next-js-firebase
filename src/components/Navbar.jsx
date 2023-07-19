@@ -62,17 +62,30 @@ const Navbar = () => {
                 {/* profile image */}
                 {
                     uid &&
-                    <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-                        <div className="w-10 rounded-full">
-                            <Image
-                                alt='Loading...'
-                                title={displayName}
-                                src={photoURL}
-                                width={40}
-                                hight={40}
-                            />
-                        </div>
-                    </label>
+                    <div className="dropdown dropdown-end">
+                        <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+                            <div className="w-10 rounded-full">
+                                <Image
+                                    alt='Loading...'
+                                    title={displayName}
+                                    src={photoURL || 'https://i.ibb.co/KxnTmtz/nextJS.png'}
+                                    width={40}
+                                    height={40}
+                                />
+                            </div>
+                        </label>
+                        <ul tabIndex={0} className="menu menu-sm grid gap-5 dropdown-content mt-3 z-[10] p-2 shadow bg-base-300 rounded-box w-52">
+                            <li><p className="font-semibold text-xl">{displayName ? displayName: email}</p></li>
+                            <li>
+                                <a className="justify-between">
+                                    Profile
+                                    <span className="badge">New</span>
+                                </a>
+                            </li>
+                            <li><a>Settings</a></li>
+                            <button onClick={handleLogout} className="btn btn-primary btn-xs">Logout</button>
+                        </ul>
+                    </div>
                 }
                 {/* dark/light toggle */}
                 <label className="swap swap-rotate">
