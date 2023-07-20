@@ -21,6 +21,10 @@ export const afterLoginNavData = [ ...commonNavData,
     {
         path: '/dashboard',
         title: 'Dashboard'
+    },
+    {
+        path: '/profile',
+        title: 'Profile'
     }
 ];
 

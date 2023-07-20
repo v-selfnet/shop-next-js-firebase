@@ -1,37 +1,39 @@
 'use client'
 
+import FaceBookLogin from "@/components/FaceBookLogin";
+import GitHubLogin from "@/components/GitHubLogin";
+import GoogleLogin from "@/components/GoogleLogin";
 import useAuth from "@/hooks/useAuth";
+import createJWT from "@/utils/createJWT";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { startTransition } from "react";
+
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { FaGoogle, FaGithub, FaFacebook } from 'react-icons/fa';
 
 const LoginForm = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const { signIn, googleLogin } = useAuth();
+    const { signIn } = useAuth();
+
+    const search = useSearchParams();
+    const from = search.get('redirectUrl') || '/';
+    const { replace, refresh } = useRouter();
 
     const onSubmit = async data => {
         // console.log(data)
         const { email, password } = data;
         const toastId = toast.loading("Loading...")
         try {
-            const user = await signIn(email, password)
+            const { user } = await signIn(email, password)
             // console.log(user)
-            toast.dismiss(toastId);
-            toast.success(`${user.displayName ? user.displayName : user.email } Signed in Successfully!`)
-        } catch (error) {
-            toast.dismiss(toastId);
-            toast.error(error.message || 'Failed to Login')
-        }
-    }
-
-    const handleGoogleLogin = async () => {
-        const toastId = toast.loading("Loading...")
-        try {
-            const user = await googleLogin();
-            toast.dismiss(toastId);
-            toast.success(`${user} Signed in Successfully!`)
-
+            await createJWT({ email });
+            startTransition(() => {
+                refresh()
+                replace(from);
+                toast.dismiss(toastId);
+                toast.success(`${user.displayName ? user.displayName : user.email} Signed in Successfully!`)
+            })
         } catch (error) {
             toast.dismiss(toastId);
             toast.error(error.message || 'Failed to Login')
@@ -106,10 +108,10 @@ const LoginForm = () => {
                 </div>
 
                 <div className="divider">Social Login</div>
-                <div className="flex justify-between items-center text-3xl text-center px-10">
-                    <FaGoogle />
-                    <FaGithub />
-                    <FaFacebook />
+                <div className="flex justify-between items-center text-center px-10">
+                    <GoogleLogin></GoogleLogin>
+                    <GitHubLogin></GitHubLogin>
+                    <FaceBookLogin></FaceBookLogin>
 
                 </div>
 

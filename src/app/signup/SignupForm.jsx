@@ -4,15 +4,21 @@ import FaceBookLogin from '@/components/FaceBookLogin';
 import GitHubLogin from '@/components/GitHubLogin';
 import GoogleLogin from '@/components/GoogleLogin';
 import useAuth from '@/hooks/useAuth';
+import createJWT from '@/utils/createJWT';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { startTransition } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { FaFacebook, FaGithub } from 'react-icons/fa';
 
 const SignupForm = () => {
     const { register, handleSubmit, formState: { errors }, getValues, setValue } = useForm();
     const { createUser, profileUpdate } = useAuth();
+
+    const search = useSearchParams();
+    const from = search.get('redirectUrl') || '/'
+    const { replace, refresh } = useRouter();
 
     // console.log(process.env.NEXT_PUBLIC_IMAGE_UPLOAD);
 
@@ -27,7 +33,7 @@ const SignupForm = () => {
                 method: "POST",
                 body: formData
             });
-            if(!res.ok) throw new Error("Failed to Upload Image")
+            if (!res.ok) throw new Error("Failed to Upload Image")
             const data = await res.json();
             console.log(data)
             toast.dismiss(toastId);
@@ -45,9 +51,14 @@ const SignupForm = () => {
         const toastId = toast.loading("Loading...")
         try {
             await createUser(email, password);
+            await createJWT({ email }) // call create JWT function
             await profileUpdate({ displayname: name, photoURL: photo });
-            toast.dismiss(toastId);
-            toast.success(`[ ${name ? name : email} ] Signed in Successfully!`);
+            startTransition(() => {
+                refresh();
+                replace(from);
+                toast.dismiss(toastId);
+                toast.success(`[ ${name ? name : email} ] Signed in Successfully!`);
+            })
         } catch (error) {
             toast.dismiss(toastId);
             toast.error(error.message || 'Failed to Login');

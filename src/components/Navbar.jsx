@@ -5,20 +5,36 @@ import useAuth from "@/hooks/useAuth";
 import useTheme from "@/hooks/useTheme";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
 const Navbar = () => {
-    const { theme, toggleTheme } = useTheme()
+    const { theme, toggleTheme } = useTheme();
     const { user, logOut } = useAuth();
     const { uid, displayName, email, password, photoURL } = user || {};
 
+    const {replace} = useRouter()
+    const path = usePathname()
+
     const navData = uid ? afterLoginNavData : beforeLoginNavData;
-    const [toggleMenu, setToggleMenu] = useState(false)
+    const [toggleMenu, setToggleMenu] = useState(false);
 
     const handleLogout = async () => {
-        await logOut();
-        toast.success('Successfully Logout!')
+        try {
+            await logOut();
+            const res = await fetch('/api/auth/logout', {
+                method: 'POST',
+            })
+            const data = await res.json();
+            if(path.includes('/profile') || path.includes('/dashboard')){
+                replace('/');
+            }
+            toast.success('Successfully Logout!')
+        } catch (error) {
+            toast.error('Logout Error')
+
+        }
     }
     const navItems = <>
         {
@@ -32,7 +48,6 @@ const Navbar = () => {
     return (
         <div className="navbar bg-base-300">
             <div className="navbar-start">
-                {/* <div className={`dropdown ${toggleMenu ? 'hidden': 'bg-green-300'}`}> */}
                 <div className="dropdown">
                     <label tabIndex={0} className="btn btn-ghost lg:hidden">
                         <input onChange={() => setToggleMenu(pre => !pre)} hidden type="checkbox" />
@@ -51,12 +66,15 @@ const Navbar = () => {
             </div>
             <div className="navbar-end flex gap-6">
                 {/* logout button */}
-                <button onClick={handleLogout} className="btn btn-primary btn-xs">Logout</button>
+                {
+                    user &&
+                    <button onClick={handleLogout} className="btn btn-primary btn-xs">Logout</button>
+                }
                 {/* shop cart */}
                 <label tabIndex={0} className="btn btn-ghost btn-circle">
                     <div className="indicator">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                        <span className="badge badge-sm indicator-item">800</span>
+                        <span className="badge badge-sm indicator-item">0</span>
                     </div>
                 </label>
                 {/* profile image */}
@@ -75,7 +93,7 @@ const Navbar = () => {
                             </div>
                         </label>
                         <ul tabIndex={0} className="menu menu-sm grid gap-5 dropdown-content mt-3 z-[10] p-2 shadow bg-base-300 rounded-box w-52">
-                            <li><p className="font-semibold text-xl">{displayName ? displayName: email}</p></li>
+                            <li><p className="font-semibold text-xl">{displayName ? displayName : email}</p></li>
                             <li>
                                 <a className="justify-between">
                                     Profile
