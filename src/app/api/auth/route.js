@@ -5,9 +5,9 @@ import { NextResponse } from "next/server";
 export const POST = async req => {
     const body = await req.json();
 
-    console.log('envLocal:', process.env.jwt_secret)
+    console.log('envLocal:', process.env.JWT_SECRET)
 
-    const secret = new TextEncoder().encode(process.env.jwt_secret);
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const alg = 'HS256';
 
     // create jwt

@@ -5,6 +5,8 @@ import { MongoClient, ServerApiVersion } from "mongodb";
  * @type {import("mongodb").Db}
  */
 
+console.log(process.env.DB_USER)
+
 let db;
 const DbConnect = async () => {
     if (db) return db;
@@ -17,7 +19,7 @@ const DbConnect = async () => {
                 deprecationErrors: true,
             }
         });
-        db = client.db('shop-online');
+        db = client.db('shopOnline');
         await client.db("admin").command({ ping: 1 });
         console.log('Shop Online Services has been successfully connected to MongoDB!')
         return db;
@@ -26,4 +28,5 @@ const DbConnect = async () => {
     }
 };
 
+DbConnect();
 export default DbConnect;

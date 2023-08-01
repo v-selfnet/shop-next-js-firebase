@@ -11,7 +11,7 @@ export const middleware = async req => {
             throw new Error('Invalide Token')
         }
 
-        const secret = new TextEncoder().encode(process.env.jwt_secret);
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
         await jwtVerify(cookie.split('Bearer ')[1], secret)
         if(isPath('/login') || isPath('/signup')){
             return NextResponse.redirect(new('/', req.url));
